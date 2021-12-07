@@ -31,9 +31,9 @@ public class DeveloperMakerController {
     public DeveloperDetailDto getDeveloperDetail(
             @PathVariable String memberId
     ) {
-        log.info("GET /developer HTTP/1.1");
+        log.info("GET /developer/" + memberId + " HTTP/1.1");
 
-        return developerMakerService.getDeveloper();
+        return developerMakerService.getDeveloperDetail(memberId);
     }
 
     @PostMapping("/create-developer")

@@ -1,6 +1,7 @@
 package kr.irumdev.spring.developermaker.service;
 
 import kr.irumdev.spring.developermaker.dto.CreateDeveloper;
+import kr.irumdev.spring.developermaker.dto.DeveloperDetailDto;
 import kr.irumdev.spring.developermaker.dto.DeveloperDto;
 import kr.irumdev.spring.developermaker.entity.Developer;
 import kr.irumdev.spring.developermaker.exception.DeveloperMakerErrorCode;
@@ -67,5 +68,14 @@ public class DeveloperMakerService {
         return developerRepository.findAll()
                 .stream().map(DeveloperDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    public DeveloperDetailDto getDeveloperDetail(String memberId) {
+//        return developerRepository.findByMemberId(memberId)
+//                .map(DeveloperDetailDto::fromEntity)
+//                .orElseThrow(() -> new DeveloperMakerException(DeveloperMakerErrorCode.NO_DEVELOPER));
+
+        return DeveloperDetailDto.fromEntity(developerRepository.findByMemberId(memberId).
+                orElseThrow(() -> new DeveloperMakerException(DeveloperMakerErrorCode.NO_DEVELOPER)));
     }
 }
