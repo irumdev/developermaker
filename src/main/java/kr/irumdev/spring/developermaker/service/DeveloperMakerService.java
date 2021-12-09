@@ -3,6 +3,7 @@ package kr.irumdev.spring.developermaker.service;
 import kr.irumdev.spring.developermaker.dto.CreateDeveloper;
 import kr.irumdev.spring.developermaker.dto.DeveloperDetailDto;
 import kr.irumdev.spring.developermaker.dto.DeveloperDto;
+import kr.irumdev.spring.developermaker.dto.EditDeveloper;
 import kr.irumdev.spring.developermaker.entity.Developer;
 import kr.irumdev.spring.developermaker.exception.DeveloperMakerErrorCode;
 import kr.irumdev.spring.developermaker.exception.DeveloperMakerException;
@@ -44,8 +45,15 @@ public class DeveloperMakerService {
 
     private void validateCreateDeveloperRequest(CreateDeveloper.Request request) {
         //business validation
-        DeveloperLevel developerLevel = request.getDeveloperLevel();
-        Integer experienceYears = request.getExperienceYears();
+        validateDeveloperRequest(request.getDeveloperLevel(), request.getExperienceYears());
+
+        developerRepository.findByMemberId(request.getMemberId())
+        .ifPresent((developer -> {
+            throw new DeveloperMakerException(DeveloperMakerErrorCode.DUPLICATED_MEMBER_ID);
+        }));
+    }
+
+    private void validateDeveloperRequest(DeveloperLevel developerLevel, Integer experienceYears) {
         if (developerLevel == DeveloperLevel.SENIOR
                 && experienceYears < 10) {
             throw new DeveloperMakerException(DeveloperMakerErrorCode.LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
@@ -57,11 +65,6 @@ public class DeveloperMakerService {
         if (developerLevel == DeveloperLevel.JUNIOR && experienceYears > 4) {
             throw new DeveloperMakerException(DeveloperMakerErrorCode.LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
         }
-
-        developerRepository.findByMemberId(request.getMemberId())
-        .ifPresent((developer -> {
-            throw new DeveloperMakerException(DeveloperMakerErrorCode.DUPLICATED_MEMBER_ID);
-        }));
     }
 
     public List<DeveloperDto> getAllDevelopers() {
@@ -77,5 +80,20 @@ public class DeveloperMakerService {
 
         return DeveloperDetailDto.fromEntity(developerRepository.findByMemberId(memberId).
                 orElseThrow(() -> new DeveloperMakerException(DeveloperMakerErrorCode.NO_DEVELOPER)));
+    }
+
+    @Transactional
+    public DeveloperDetailDto editDeveloper(String memberId, EditDeveloper.Request request) {
+        validateDeveloperRequest(request.getDeveloperLevel(), request.getExperienceYears());
+
+        Developer developer = developerRepository.findByMemberId(memberId).orElseThrow(
+                () -> new DeveloperMakerException(DeveloperMakerErrorCode.NO_DEVELOPER)
+        );
+
+        developer.setDeveloperLevel(request.getDeveloperLevel());
+        developer.setDeveloperSkillType(request.getDeveloperSkillType());
+        developer.setExperienceYears(request.getExperienceYears());
+
+        return DeveloperDetailDto.fromEntity(developer);
     }
 }

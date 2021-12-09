@@ -3,6 +3,7 @@ package kr.irumdev.spring.developermaker.controller;
 import kr.irumdev.spring.developermaker.dto.CreateDeveloper;
 import kr.irumdev.spring.developermaker.dto.DeveloperDetailDto;
 import kr.irumdev.spring.developermaker.dto.DeveloperDto;
+import kr.irumdev.spring.developermaker.dto.EditDeveloper;
 import kr.irumdev.spring.developermaker.service.DeveloperMakerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +32,7 @@ public class DeveloperMakerController {
     public DeveloperDetailDto getDeveloperDetail(
             @PathVariable String memberId
     ) {
-        log.info("GET /developer/" + memberId + " HTTP/1.1");
+        log.info("GET /developer/{} HTTP/1.1", memberId);
 
         return developerMakerService.getDeveloperDetail(memberId);
     }
@@ -43,5 +44,15 @@ public class DeveloperMakerController {
         log.info("request : {}", request);
 
         return developerMakerService.createDeveloper(request);
+    }
+
+    @PutMapping("/developer/{memberId}")
+    public DeveloperDetailDto editDeveloper(
+            @PathVariable String memberId,
+            @Valid @RequestBody EditDeveloper.Request request
+    ) {
+        log.info("PUT /developer/{} HTTP/1.1", memberId);
+
+        return developerMakerService.editDeveloper(memberId, request);
     }
 }
