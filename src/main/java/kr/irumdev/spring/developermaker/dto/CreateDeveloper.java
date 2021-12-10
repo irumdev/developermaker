@@ -1,5 +1,6 @@
 package kr.irumdev.spring.developermaker.dto;
 
+import kr.irumdev.spring.developermaker.code.StatusCode;
 import kr.irumdev.spring.developermaker.entity.Developer;
 import kr.irumdev.spring.developermaker.type.DeveloperLevel;
 import kr.irumdev.spring.developermaker.type.DeveloperSkillType;
@@ -50,6 +51,7 @@ public class CreateDeveloper {
         private Integer experienceYears;
         private String memberId;
         private String name;
+        private StatusCode statusCode;
 
         public static Response fromEntity(Developer developer){
             return Response.builder()
@@ -58,6 +60,7 @@ public class CreateDeveloper {
                     .experienceYears(developer.getExperienceYears())
                     .memberId(developer.getMemberId())
                     .name(developer.getName())
+                    .statusCode(developer.getStatusCode())
                     .build();
         }
     }

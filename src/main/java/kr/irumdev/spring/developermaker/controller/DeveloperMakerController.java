@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -25,7 +23,7 @@ public class DeveloperMakerController {
     public List<DeveloperDto> getAllDevelopers() {
         log.info("GET /developers HTTP/1.1");
 
-        return developerMakerService.getAllDevelopers();
+        return developerMakerService.getAllEmployedDevelopers();
     }
 
     @GetMapping("/developer/{memberId}")
@@ -40,7 +38,7 @@ public class DeveloperMakerController {
     @PostMapping("/create-developer")
     public CreateDeveloper.Response createDevelopers(
             @Valid @RequestBody CreateDeveloper.Request request
-            ) {
+    ) {
         log.info("request : {}", request);
 
         return developerMakerService.createDeveloper(request);
@@ -54,5 +52,14 @@ public class DeveloperMakerController {
         log.info("PUT /developer/{} HTTP/1.1", memberId);
 
         return developerMakerService.editDeveloper(memberId, request);
+    }
+
+    @DeleteMapping("/developer/{memberId}")
+    public DeveloperDetailDto deleteDeveloper(
+            @PathVariable String memberId
+    ) {
+        log.info("DELETE /developer/{} HTTP/1.1", memberId);
+
+        return developerMakerService.deleteDeveloper(memberId);
     }
 }

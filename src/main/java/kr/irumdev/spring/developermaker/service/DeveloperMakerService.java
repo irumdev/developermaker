@@ -1,13 +1,16 @@
 package kr.irumdev.spring.developermaker.service;
 
+import kr.irumdev.spring.developermaker.code.StatusCode;
 import kr.irumdev.spring.developermaker.dto.CreateDeveloper;
 import kr.irumdev.spring.developermaker.dto.DeveloperDetailDto;
 import kr.irumdev.spring.developermaker.dto.DeveloperDto;
 import kr.irumdev.spring.developermaker.dto.EditDeveloper;
 import kr.irumdev.spring.developermaker.entity.Developer;
+import kr.irumdev.spring.developermaker.entity.RetiredDeveloper;
 import kr.irumdev.spring.developermaker.exception.DeveloperMakerErrorCode;
 import kr.irumdev.spring.developermaker.exception.DeveloperMakerException;
 import kr.irumdev.spring.developermaker.repository.DeveloperRepository;
+import kr.irumdev.spring.developermaker.repository.RetiredDeveloperRepository;
 import kr.irumdev.spring.developermaker.type.DeveloperLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DeveloperMakerService {
     private final DeveloperRepository developerRepository;
+    private final RetiredDeveloperRepository retiredDeveloperRepository;
 
     // ACID
     // Atomic 원자성 -> All or Not
@@ -37,6 +41,7 @@ public class DeveloperMakerService {
                 .memberId(request.getMemberId())
                 .name(request.getName())
                 .age(request.getAge())
+                .statusCode(StatusCode.EMPLOYED)
                 .build();
 
         developerRepository.save(developer);
@@ -67,8 +72,8 @@ public class DeveloperMakerService {
         }
     }
 
-    public List<DeveloperDto> getAllDevelopers() {
-        return developerRepository.findAll()
+    public List<DeveloperDto> getAllEmployedDevelopers() {
+        return developerRepository.findDevelopersByStatusCodeEquals(StatusCode.EMPLOYED)
                 .stream().map(DeveloperDto::fromEntity)
                 .collect(Collectors.toList());
     }
@@ -94,6 +99,20 @@ public class DeveloperMakerService {
         developer.setDeveloperSkillType(request.getDeveloperSkillType());
         developer.setExperienceYears(request.getExperienceYears());
 
+        return DeveloperDetailDto.fromEntity(developer);
+    }
+
+    @Transactional
+    public DeveloperDetailDto deleteDeveloper(String memberId) {
+        Developer developer = developerRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new DeveloperMakerException(DeveloperMakerErrorCode.NO_DEVELOPER));
+        developer.setStatusCode(StatusCode.RETIRED);
+
+        RetiredDeveloper retiredDeveloper = RetiredDeveloper.builder()
+                .memberId(memberId)
+                .name(developer.getName())
+                .build();
+        retiredDeveloperRepository.save(retiredDeveloper);
         return DeveloperDetailDto.fromEntity(developer);
     }
 }
