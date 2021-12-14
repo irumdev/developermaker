@@ -1,14 +1,13 @@
 package kr.irumdev.spring.developermaker.controller;
 
-import kr.irumdev.spring.developermaker.dto.CreateDeveloper;
-import kr.irumdev.spring.developermaker.dto.DeveloperDetailDto;
-import kr.irumdev.spring.developermaker.dto.DeveloperDto;
-import kr.irumdev.spring.developermaker.dto.EditDeveloper;
+import kr.irumdev.spring.developermaker.dto.*;
+import kr.irumdev.spring.developermaker.exception.DeveloperMakerException;
 import kr.irumdev.spring.developermaker.service.DeveloperMakerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -61,5 +60,22 @@ public class DeveloperMakerController {
         log.info("DELETE /developer/{} HTTP/1.1", memberId);
 
         return developerMakerService.deleteDeveloper(memberId);
+    }
+
+    @ExceptionHandler
+    public DeveloperMakerErrorResponse handleException(
+            DeveloperMakerException e,
+            HttpServletRequest request
+    ) {
+        log.error("errorCode: {}, url: {}, message: {}",
+                e.getDeveloperMakerErrorCode(),
+                request.getRequestURI(),
+                e.getDetailMessage()
+        );
+
+        return DeveloperMakerErrorResponse.builder()
+                .errorCode(e.getDeveloperMakerErrorCode())
+                .errorMessage(e.getDetailMessage())
+                .build();
     }
 }
