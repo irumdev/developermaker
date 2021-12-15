@@ -61,21 +61,4 @@ public class DeveloperMakerController {
 
         return developerMakerService.deleteDeveloper(memberId);
     }
-
-    @ExceptionHandler
-    public DeveloperMakerErrorResponse handleException(
-            DeveloperMakerException e,
-            HttpServletRequest request
-    ) {
-        log.error("errorCode: {}, url: {}, message: {}",
-                e.getDeveloperMakerErrorCode(),
-                request.getRequestURI(),
-                e.getDetailMessage()
-        );
-
-        return DeveloperMakerErrorResponse.builder()
-                .errorCode(e.getDeveloperMakerErrorCode())
-                .errorMessage(e.getDetailMessage())
-                .build();
-    }
 }
