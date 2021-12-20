@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
@@ -48,7 +49,7 @@ class DeveloperMakerServiceTest {
                     .developerLevel(DeveloperLevel.SENIOR)
                     .developerSkillType(DeveloperSkillType.FRONT_END)
                     .experienceYears(12)
-                    .memberId("memberId")
+                    .memberId("memberId2")
                     .name("name")
                     .age(32)
                     .build();
@@ -73,6 +74,8 @@ class DeveloperMakerServiceTest {
         //given
         given(developerRepository.findByMemberId(anyString()))
                 .willReturn(Optional.empty());
+        given(developerRepository.save(any()))
+                .willReturn(defaultDeveloper);
         ArgumentCaptor<Developer> captor =
                 ArgumentCaptor.forClass(Developer.class);
 
