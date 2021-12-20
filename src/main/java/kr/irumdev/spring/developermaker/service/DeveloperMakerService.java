@@ -63,7 +63,7 @@ public class DeveloperMakerService {
 
     @Transactional
     public DeveloperDetailDto editDeveloper(String memberId, EditDeveloper.Request request) {
-        validateDeveloperRequest(request.getDeveloperLevel(), request.getExperienceYears());
+        request.getDeveloperLevel().validateExperienceYears(request.getExperienceYears());
 
         return DeveloperDetailDto.fromEntity(
                 getUpdatedDeveloperFromRequest(
@@ -91,26 +91,12 @@ public class DeveloperMakerService {
 
     private void validateCreateDeveloperRequest(CreateDeveloper.Request request) {
         //business validation
-        validateDeveloperRequest(request.getDeveloperLevel(), request.getExperienceYears());
+        request.getDeveloperLevel().validateExperienceYears(request.getExperienceYears());
 
         developerRepository.findByMemberId(request.getMemberId())
         .ifPresent((developer -> {
             throw new DeveloperMakerException(DeveloperMakerErrorCode.DUPLICATED_MEMBER_ID);
         }));
-    }
-
-    private void validateDeveloperRequest(DeveloperLevel developerLevel, Integer experienceYears) {
-        if (developerLevel == DeveloperLevel.SENIOR
-                && experienceYears < 10) {
-            throw new DeveloperMakerException(DeveloperMakerErrorCode.LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
-        }
-        if (developerLevel == DeveloperLevel.JUNGNIOR
-                && (experienceYears < 4 || experienceYears > 10)) {
-            throw new DeveloperMakerException(DeveloperMakerErrorCode.LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
-        }
-        if (developerLevel == DeveloperLevel.JUNIOR && experienceYears > 4) {
-            throw new DeveloperMakerException(DeveloperMakerErrorCode.LEVEL_EXPERIENCE_YEARS_NOT_MATCHED);
-        }
     }
 
     private Developer getUpdatedDeveloperFromRequest(EditDeveloper.Request request, Developer developer) {
